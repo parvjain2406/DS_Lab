@@ -1,0 +1,140 @@
+Question:
+
+WAP to Implement doubly link list with primitive 
+operations
+a) Create a doubly linked list.
+b) Insert a new node to the left of the node.
+c) Delete the node based on a specific value
+d) Display the contents of the list
+
+Input:
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node *prev;
+    struct Node *next;
+};
+
+struct Node* createNode(int value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = value;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+    return newNode;
+}
+
+void append(struct Node **head, int value) {
+    struct Node* newNode = createNode(value);
+
+    if (*head == NULL) {
+        *head = newNode;
+        return;
+    }
+
+    struct Node* temp = *head;
+    while (temp->next != NULL)
+        temp = temp->next;
+
+    temp->next = newNode;
+    newNode->prev = temp;
+}
+
+void insertLeft(struct Node **head, int target, int value) {
+    struct Node *temp = *head;
+
+    while (temp != NULL && temp->data != target)
+        temp = temp->next;
+
+    if (temp == NULL) {
+        printf("Node with value %d not found!\n", target);
+        return;
+    }
+
+    struct Node *newNode = createNode(value);
+
+    newNode->next = temp;
+    newNode->prev = temp->prev;
+
+    if (temp->prev != NULL)
+        temp->prev->next = newNode;
+    else
+        *head = newNode;    
+
+    temp->prev = newNode;
+}
+
+void deleteValue(struct Node **head, int target) {
+    struct Node *temp = *head;
+
+    while (temp != NULL && temp->data != target)
+        temp = temp->next;
+
+    if (temp == NULL) {
+        printf("Value %d not found in list!\n", target);
+        return;
+    }
+
+    if (temp->prev != NULL)
+        temp->prev->next = temp->next;
+    else
+        *head = temp->next;
+
+    if (temp->next != NULL)
+        temp->next->prev = temp->prev;
+
+    free(temp);
+}
+
+void displayForward(struct Node *head) {
+    printf("List (forward): ");
+    while (head != NULL) {
+        printf("%d <-> ", head->data);
+        head = head->next;
+    }
+    printf("NULL\n");
+}
+
+void displayBackward(struct Node *head) {
+    struct Node *temp = head;
+
+    while (temp && temp->next != NULL)
+        temp = temp->next;
+
+    printf("List (backward): ");
+    while (temp != NULL) {
+        printf("%d <-> ", temp->data);
+        temp = temp->prev;
+    }
+    printf("NULL\n");
+}
+
+int main() {
+    struct Node *head = NULL;
+
+    append(&head, 10);
+    append(&head, 20);
+    append(&head, 30);
+
+    displayForward(head);
+
+    insertLeft(&head, 20, 15);
+    displayForward(head);
+
+    deleteValue(&head, 30);
+    displayForward(head);
+
+    displayBackward(head);
+
+    return 0;
+}
+
+
+Output:
+
+List (forward): 10 <-> 20 <-> 30 <-> NULL       
+List (forward): 10 <-> 15 <-> 20 <-> 30 <-> NULL
+List (forward): 10 <-> 15 <-> 20 <-> NULL       
+List (backward): 20 <-> 15 <-> 10 <-> NULL 
